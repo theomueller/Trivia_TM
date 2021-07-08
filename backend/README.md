@@ -14,6 +14,7 @@ pip install -r requirements.txt
 ```
 This will install all of the required packages we selected within the `requirements.txt` file.
 
+/// TM: be carefull of the version - if needed upgrade them !
 
 4. **Key Dependencies**
  - [Flask](http://flask.pocoo.org/)  is a lightweight backend microservices framework. Flask is required to handle requests and responses.
@@ -23,6 +24,40 @@ This will install all of the required packages we selected within the `requireme
  - [Flask-CORS](https://flask-cors.readthedocs.io/en/latest/#) is the extension we'll use to handle cross origin requests from our frontend server. 
 
 ### Database Setup
+/// TM: pg_ctl -D /usr/local/var/postgres start
+///
+### Step 1 - Create and Populate the database
+1. **Verify the database username**<br>
+Verify that the database user in the `/backend/books.psql`, `/backend/models.py`, and `/backend/test_flaskr.py` files must be either the `student` or `postgres` (default username). FYI, the classroom workspace uses the `student`/`student` user credentials, whereas, the local implementation can use the dafault `postgres` user without a password as well. (See the `/backend/setup.sql` for more details!)
+
+2. **Create the database and a user**<br>
+In your terminal, navigate to the */nd0044-c2-API-Development-and-Documentation-exercises/1_Requests_Starter/backend/* directory, and run the following:
+```bash
+cd nd0044-c2-API-Development-and-Documentation-exercises/1_Requests_Starter/backend
+# Connect to the PostgreSQL
+psql postgres
+#View all databases
+\l
+# Create the database, create a user - `student`, grant all privileges to the student
+\i setup.sql
+# Exit the PostgreSQL prompt
+\q
+```
+
+
+3. **Create tables**<br>
+Once your database is created, you can create tables (`bookshelf`) and apply contraints
+```bash
+# Mac users
+psql -f books.psql -U student -d bookshelf
+# Linux users
+su - postgres bash -c "psql bookshelf < /path/to/exercise/backend/books.psql"
+
+```
+**You can even drop the database and repopulate it, if needed, using the commands above.** 
+
+/////
+
 With Postgres running, restore a database using the trivia.psql file provided. From the backend folder in terminal run:
 ```bash
 psql trivia < trivia.psql

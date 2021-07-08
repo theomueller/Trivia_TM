@@ -8,6 +8,16 @@ from models import setup_db, Question, Category
 
 QUESTIONS_PER_PAGE = 10
 
+def paginate_questions(request,selection):
+    page = request.args.get('page',1,type=int)
+    start =  (page - 1) * QUESTIONS_PER_PAGE
+    end = start + QUESTIONS_PER_PAGE
+
+    questions = [question.format() for question in selection]
+    current_questions = questions[start:end]
+
+    return current_questions
+
 def create_app(test_config=None):
   # create and configure the app
   app = Flask(__name__)
@@ -16,17 +26,32 @@ def create_app(test_config=None):
   '''
   @TODO: Set up CORS. Allow '*' for origins. Delete the sample route after completing the TODOs
   '''
-
+  CORS(app)
   '''
   @TODO: Use the after_request decorator to set Access-Control-Allow
   '''
-
+  @app.after_request
+  def after_request(response):
+    response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization,true')
+    response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
+    return response
   '''
   @TODO: 
   Create an endpoint to handle GET requests 
   for all available categories.
   '''
+  @app.route('/categoies')
+  def get_categories():
+    categories = Category.query.order_by(Category.type).all()
 
+    if len(categories) == 0:
+      abort(404)
+
+    return jsonify({
+        'success': True,
+        'categories': categories,
+        'total_categories': len(categories)
+      })
 
   '''
   @TODO: 
@@ -40,6 +65,21 @@ def create_app(test_config=None):
   ten questions per page and pagination at the bottom of the screen for three pages.
   Clicking on the page numbers should update the questions. 
   '''
+  @app.route('/questions')
+  def retrieve_questions():
+    selection = Question.query.order_by(Question.category).all()
+    current_questions = paginate_questions(request,selection)
+
+    if len(current_questions) == 0:
+      abort(404)
+
+    return jsonify({
+        'success': True,
+        'questions': current_questions,
+        'total_questions': len(Question.query.all()),
+        'current_categorie': 0,
+        'categories': Category.query.order_by(Category.type).all(),
+      })
 
   '''
   @TODO: 
