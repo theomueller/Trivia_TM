@@ -77,6 +77,15 @@ The first time you run the tests, omit the dropdb command.
 
 All tests are kept in that file and should be maintained as updates are made to app functionality. 
 
+Ergebnisse:
+```
+........
+----------------------------------------------------------------------
+Ran 8 tests in 0.339s
+
+OK
+```
+
 ###  API REFERENCE
 ### Getting Started
 - Base URL: At present this app can only be run locally and is not hosted as a base URL. The backend app is hosted at the default, `http://127.0.0.1:5000/`, which is set as a proxy in the frontend configuration. 
@@ -91,10 +100,12 @@ Errors are returned as JSON objects in the following format:
     "message": "bad request"
 }
 ```
-The API will return three error types when requests fail:
+The API will return five error types when requests fail:
 - 400: Bad Request
 - 404: Resource Not Found
-- 422: Not Processable 
+- 405: Method not allowed 
+- 422: Unprocessable
+- 500: Internal server error 
 
 ### Endpoints 
 #### GET /questions
@@ -103,7 +114,8 @@ The API will return three error types when requests fail:
     - Results are paginated in groups of 10. Include a request argument to choose page number, starting from 1. 
 - Sample: `curl http://127.0.0.1:5000/questions`
 
-```curl http://127.0.0.1:5000/questions
+`curl http://127.0.0.1:5000/questions`
+```
 {
   "categories": {
     "1": "Science", 

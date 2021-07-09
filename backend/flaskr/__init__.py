@@ -234,8 +234,10 @@ def create_app(test_config=None):
   one question at a time is displayed, the user is allowed to answer
   and shown whether they were correct or not. 
   '''
+
   @app.route('/quizzes', methods=["POST"])
   def play_quizz():
+      
       body = request.get_json()
       try:  
         previous_questions = body['previous_questions']
@@ -266,7 +268,16 @@ def create_app(test_config=None):
   @TODO: 
   Create error handlers for all expected errors 
   including 404 and 422. 
-  '''
+  ''' 
+  
+  @app.errorhandler(400)
+  def bad_request(error):
+    return jsonify({
+      "success": False, 
+      "error": 400,
+      "message": "bad request"
+      }), 400
+      
   @app.errorhandler(404)
   def not_found(error):
     return jsonify({
@@ -274,6 +285,14 @@ def create_app(test_config=None):
       "error": 404,
       "message": "resource not found"
       }), 404
+
+  @app.errorhandler(405)
+  def not_found(error):
+    return jsonify({
+      "success": False, 
+      "error": 405,
+      "message": "method not allowed"
+      }), 405
 
   @app.errorhandler(422)
   def unprocessable(error):
@@ -283,13 +302,7 @@ def create_app(test_config=None):
       "message": "unprocessable"
       }), 422
 
-  @app.errorhandler(400)
-  def bad_request(error):
-    return jsonify({
-      "success": False, 
-      "error": 400,
-      "message": "bad request"
-      }), 400
+ 
 
   @app.errorhandler(500)
   def server_error(error):
