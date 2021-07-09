@@ -1,5 +1,5 @@
 import os
-from flask import Flask, request, abort, jsonify
+from flask import Flask, json, request, abort, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 import random
@@ -134,6 +134,10 @@ def create_app(test_config=None):
       new_category = body.get('category',None)
       new_difficulty = body.get('difficulty',None)
 
+      # add a test to avoid creating empty questions
+      if new_question is None or new_answer is None or new_category is None or  new_difficulty is None:
+        abort(400)
+
       try:
           question = Question(
           question = new_question,
@@ -179,13 +183,17 @@ def create_app(test_config=None):
         if search:
             selection = Question.query.filter(Question.question.ilike(f'%{search}%'))\
               .order_by(Question.category).all()
-            questions = paginate_questions(request, selection)
-            return jsonify({
-              'success': True,
-              'questions':questions,
-              'total_questions':len(questions),
-              'current_category': 0
-              })
+            if len(selection) == 0:
+                return jsonify({
+                  'success': False,
+                  'questions': [],
+                })
+            else:
+                questions = paginate_questions(request, selection)
+                return jsonify({
+                'success': True,
+                'questions':questions,
+                })
       except:
         abort(422)
 
@@ -221,10 +229,38 @@ def create_app(test_config=None):
   and return a random questions within the given category, 
   if provided, and that is not one of the previous questions. 
 
+  
   TEST: In the "Play" tab, after a user selects "All" or a category,
   one question at a time is displayed, the user is allowed to answer
   and shown whether they were correct or not. 
   '''
+  @app.route('/quizzes', methods=["POST"])
+  def play_quizz():
+      body = request.get_json()
+      try:  
+        previous_questions = body['previous_questions']
+        quiz_category_id = body['quiz_category']['id']
+        # test if the user selects "All"
+        if quiz_category_id == 0: 
+          questions = Question.query.order_by(Question.id).all()
+        else: 
+          questions = Question.query.filter(Question.category == quiz_category_id).order_by(Question.id).all()
+        
+        # need to test questions againt previous_questions
+        if len(questions) > len(previous_questions):
+          question = questions[len(previous_questions)]
+          return jsonify({
+            'success': True,
+            'question': question.format(),
+            'total_questions': len(questions)})
+        else:
+          return jsonify({
+            'success': False,
+            'question': None,
+          })
+        
+      except:
+        abort(404)
 
   '''
   @TODO: 
@@ -254,6 +290,14 @@ def create_app(test_config=None):
       "error": 400,
       "message": "bad request"
       }), 400
+
+  @app.errorhandler(500)
+  def server_error(error):
+    return jsonify({
+      "success": False, 
+      "error": 500,
+      "message": "INTERNAL SERVER ERROR"
+      }), 500
 
   return app
 

@@ -16,7 +16,8 @@ class QuizView extends Component {
         numCorrect: 0,
         currentQuestion: {},
         guess: '',
-        forceEnd: false
+        forceEnd: false,
+        totalQuestions: 0,
     }
   }
 
@@ -48,7 +49,7 @@ class QuizView extends Component {
     if(this.state.currentQuestion.id) { previousQuestions.push(this.state.currentQuestion.id) }
 
     $.ajax({
-      url: '/quizzes', //TODO: update request URL
+      url: '/quizzes', //TODO: update request URL => Done
       type: "POST",
       dataType: 'json',
       contentType: 'application/json',
@@ -66,7 +67,8 @@ class QuizView extends Component {
           previousQuestions: previousQuestions,
           currentQuestion: result.question,
           guess: '',
-          forceEnd: result.question ? false : true
+          forceEnd: result.question ? false : true,
+          totalQuestions: result.total_questions // the idea was to dislay how many questions are available
         })
         return;
       },
@@ -150,7 +152,8 @@ class QuizView extends Component {
   }
 
   renderPlay(){
-    return this.state.previousQuestions.length === questionsPerPlay || this.state.forceEnd
+    
+    return this.state.previousQuestions.length === questionsPerPlay || this.state.forceEnd    
       ? this.renderFinalScore()
       : this.state.showAnswer 
         ? this.renderCorrectAnswer()

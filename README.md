@@ -1,11 +1,16 @@
-# Full Stack API Final Project
 
 
-## Full Stack Trivia
+********************************************
+****      Project Basic TRIVIA APP      ****
+********************************************
 
-Udacity is invested in creating bonding experiences for its employees and students. A bunch of team members got the idea to hold trivia on a regular basis and created a webpage to manage the trivia app and play the game, but their API experience is limited and still needs to be built out.
 
-That's where you come in! Help them finish the trivia app so they can start holding trivia and seeing who's the most knowledgeable of the bunch. The application must:
+# Description
+Based on the UDACITY project, this version of the trivia app enables the user to play the game, but there is still a lot of possible improvements
+
+That's where you come in! Help the community to improve this version of the trivia app so they can start holding trivia and seeing who's the most knowledgeable of the bunch. 
+
+What the application does:
 
 1. Display questions - both all questions and by category. Questions should show the question, category and difficulty rating by default and can show/hide the answer.
 2. Delete questions.
@@ -13,53 +18,18 @@ That's where you come in! Help them finish the trivia app so they can start hold
 4. Search for questions based on a text query string.
 5. Play the quiz game, randomizing either all questions or within a specific category.
 
-Completing this trivia app will give you the ability to structure plan, implement, and test an API - skills essential for enabling your future applications to communicate with others.
+What the application would need:
 
-## Starting and Submitting the Project
-
-[Fork](https://help.github.com/en/articles/fork-a-repo) the [project repository](https://github.com/udacity/FSND/blob/master/projects/02_trivia_api/starter) and [Clone](https://help.github.com/en/articles/cloning-a-repository) your forked repository to your machine. Work on the project locally and make sure to push all your changes to the remote repository before submitting the link to your repository in the Classroom.
->Once you're ready, you can submit your project on the last page.
-
-## About the Stack
-
-We started the full stack application for you. It is designed with some key functional areas:
-
-### Backend
-The [./backend](https://github.com/udacity/FSND/blob/master/projects/02_trivia_api/starter/backend/README.md) directory contains a partially completed Flask and SQLAlchemy server. You will work primarily in `__init__.py` to define your endpoints and can reference models.py for DB and SQLAlchemy setup. These are the files you'd want to edit in the backend:
-
-1. *./backend/flaskr/`__init__.py`*
-2. *./backend/test_flaskr.py*
-
-
-### Frontend
-
-The [./frontend](https://github.com/udacity/FSND/blob/master/projects/02_trivia_api/starter/frontend/README.md) directory contains a complete React frontend to consume the data from the Flask server. If you have prior experience building a frontend application, you should feel free to edit the endpoints as you see fit for the backend you design. If you do not have prior experience building a frontend application, you should read through the frontend code before starting and make notes regarding:
-
-1. What are the end points and HTTP methods the frontend is expecting to consume?
-2. How are the requests from the frontend formatted? Are they expecting certain parameters or payloads? 
-
-Pay special attention to what data the frontend is expecting from each API response to help guide how you format your API. The places where you may change the frontend behavior, and where you should be looking for the above information, are marked with `TODO`. These are the files you'd want to edit in the frontend:
-
-1. *./frontend/src/components/QuestionView.js*
-2. *./frontend/src/components/FormView.js*
-3. *./frontend/src/components/QuizView.js*
-
-
-By making notes ahead of time, you will practice the core skill of being able to read and understand code and will have a simple plan to follow to build out the endpoints of your backend API. 
-
-
-
->View the [README within ./frontend for more details.](./frontend/README.md)
-
-
-
-********************************************
-Project TRIVIA
+1. Add an additional question field such as rating and make all corresponding updates (db, api endpoints, add question form, etc.)
+2. Add users to the DB and track their game scores
+3. Add capability to create new categories.
 
 # Getting Started
 
 ### Pre-requisites and Local Development 
-Developers using this project should already have Python3, pip and node installed on their local machines.
+Developers using this project should already have Python3, pip and node installed on their local machines. Please refer to the corresponding internet pages to get these packages installed. 
+
+All backend code follows [PEP8 style guidelines](https://www.python.org/dev/peps/pep-0008/). 
 
 #### Backend
 
@@ -233,10 +203,39 @@ The API will return three error types when requests fail:
   "total_questions": 22
 }
 ```
+
+#### POST /Questions with Search
+- General:
+    - Searches for a question based on a search term. 
+    Returns any questions for whom the search term is a substring of the question.
+
+- `curl http://127.0.0.1:5000/questions\?page\=1 -X POST -H "Content-Type: application/json" -d '{"searchTerm":"caged"}'`
+```
+ {
+  "questions": [
+    {
+      "answer": "Maya Angelou", 
+      "category": 4, 
+      "difficulty": 2, 
+      "id": 5, 
+      "question": "Whose autobiography is entitled 'I Know Why the Caged Bird Sings'?"
+    }
+  ], 
+  "success": true
+}
+```   
+if no question is found, the route will return:
+```
+{
+  "questions": [], 
+  "success": false
+}
+```
+
 #### DELETE /questions/{question_id}
 - General:
     - Deletes the question  of the given ID if it exists. Returns the id of the deleted question, success value, total questions, and question list based on current page number to update the frontend. 
-- `curl -X DELETE http://127.0.0.1:5000/questions/26?page=1`
+- `curl -X DELETE http://127.0.0.1:5000/questions/26`
 ```
 {
   "questions": [
@@ -314,7 +313,32 @@ The API will return three error types when requests fail:
   "success": true, 
   "total_questions": 20
 }
+```
+#### POST /quizzes/
+ - General:
+    -  Get questions to play the quiz. 
+        This endpoint takes category (be carefull: provide an object category, at least {"id":"xxx"}) and previous question parameters and returns a random questions within the given category, 
+        if provided, and that is not one of the previous questions. 
+
+- `curl http://127.0.0.1:5000/quizzes -X POST -H "Content-Type: application/json" -d '{"previous_questions":"", "quiz_category":{"id":"1"}}'`
+```
+{
+  "question": {
+    "answer": "The Liver", 
+    "category": 1, 
+    "difficulty": 4, 
+    "id": 20, 
+    "question": "What is the heaviest organ in the human body?"
+  }, 
+  "success": true, 
+  "total_questions": 4
+  ```
 
 
+## Authors
+Changes from starter done by me: Thibaut Meunier 
 
-
+## Acknowledgements 
+Thanks Coach Carin for the great teaching !
+And Thanks to the awesome team at Udacity !
+Good lock for all of the students, soon to be full stack extraordinaires! 
