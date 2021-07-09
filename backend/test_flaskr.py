@@ -51,6 +51,15 @@ class TriviaTestCase(unittest.TestCase):
         self.assertTrue((data['categories']))
         self.assertTrue(len(data['categories']))
 
+    ## added test_get_paginated_questions failure scenario
+    def test_404_get_paginated_questions(self):
+        res = self.client().get('/questions?page=1000')
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 404)
+        self.assertEqual(data['success'], False)
+        self.assertEqual(data['message'], "resource not found")
+
     def test_get_categories(self):
         res = self.client().get('/categories')
         data = json.loads(res.data)
@@ -69,19 +78,37 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(data['message'], "resource not found")
         
     def test_create_new_question(self):
-        res = self.client().post('/books', json=self.new_question)
+        res = self.client().post('/questions', json=self.new_question)
         data = json.loads(res.data)
         pass
 
-    def test_422_delete_book(self):
-         res = self.client().delete('/questions/1000')
-         data = json.loads(res.data)
+    def test_400_create_bad_question(self):
+        res = self.client().post('/questions', json={"answer":"toto"})
+        data = json.loads(res.data)
 
-         question = Question.query.filter(Question.id == 1).one_or_none()
+        self.assertEqual(res.status_code, 400)
+        self.assertEqual(data['success'], False)
+        self.assertEqual(data['message'], 'bad request')
 
-         self.assertEqual(res.status_code, 422)
-         self.assertEqual(data['success'], False)
-         self.assertEqual(question, None)
+    def test_delete_question(self):
+        questionFirst = Question.query.first()
+        strDel="/questions/{}"
+        res = self.client().delete(strDel.format(questionFirst.id))
+        data = json.loads(res.data)
+        
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data['success'], True)
+        
+    
+    def test_422_delete_question(self):
+        res = self.client().delete('/questions/1000')
+        data = json.loads(res.data)
+
+        question = Question.query.filter(Question.id == 1000).one_or_none()
+
+        self.assertEqual(res.status_code, 422)
+        self.assertEqual(data['success'], False)
+        self.assertEqual(question, None)
 
     def test_400_post_bad_search_question(self):
         res = self.client().post('/questions', json={'search':'the'})
@@ -91,6 +118,8 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(data['success'], False)
         self.assertEqual(data['message'], 'bad request') 
 
+
+############ Quizzes 
     def test_405_quizzes(self):
         res = self.client().get('/quizzes')
         self.assertEqual(res.status_code, 405)
@@ -103,8 +132,27 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(data['success'], True)
         self.assertTrue(data['question'])
 
+    def test_404_wrong_next_question_quizzes(self):
+        res = self.client().post('quizzes',json={"quiz_category":"1"})
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 404)
+        self.assertEqual(data['success'], False)
+        self.assertEqual(data['message'], "resource not found") 
+
+        ############ Added after review:
+        '''
+        test_get_paginated_questions failure scenario : done
+        test_create_new_question failure scenario: done
+        test_get_next_question_quizzes failure scenario: dome
+        test_422_delete_book success scenario: done
+        test_400_post_bad_search_question success scenario : done
+        test_405_quizzes success scenario: done '''
+
+
 
     
+
 # Make the tests conveniently executable
 if __name__ == "__main__":
     unittest.main()

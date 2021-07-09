@@ -80,9 +80,9 @@ All tests are kept in that file and should be maintained as updates are made to 
 Ergebnisse:
 ```
 ........
+............
 ----------------------------------------------------------------------
-Ran 8 tests in 0.339s
-
+Ran 12 tests in 0.429s
 OK
 ```
 
